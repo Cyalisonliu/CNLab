@@ -88,7 +88,7 @@ const DashboardContent = ({login, setLogin, theme, template, setTemplate, addTim
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                         <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' ,borderRadius: 2}}>
-                            <UserTable users={users} setUsers={setUsers} addtime={addTime}/>
+                            <UserTable users={users} setUsers={setUsers} addtime={addTime} template={template}/>
                         </Paper>
                     </Grid>
                   </Grid>
