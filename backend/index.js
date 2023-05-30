@@ -317,3 +317,13 @@ app.delete('/delete/RaduseUser/:username', (req, res) => {
         }
     })
 })
+app.delete('/delete/userinfo/:username', (req, res) => {
+    const username = req.params.username;
+    db.query("DELETE FROM userinfo WHERE username = ?", username, (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.send(result);
+        }
+    })
+})
