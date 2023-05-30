@@ -36,6 +36,13 @@ const Guess = ({theme, add_time, total_time}) => {
 
     const check = () => {
         console.log(guess);
+        if (ans.length != guess.length) {
+            setAlertmessage("輸入長度應該為4!!!");
+            setSeverity('error');
+            setShowmessage(true);
+            closeAlert();
+            return;
+        }
         let a_cnt = 0, b_cnt = 0;
         for (let i = 0; i < guess.length; ++i) {
             if (!(guess.charCodeAt(i) >= 48 && guess.charCodeAt(i) <= 57)) {
