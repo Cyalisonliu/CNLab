@@ -14,7 +14,7 @@ function genRandom(x) {
     for (var i = 0; i < x; ++i) {
         let d = Math.floor(Math.random() * arr.length);
         s = s + arr[d];
-        arr.splice(d, d);
+        arr.splice(d, 1);
     }
     console.log(s);
     return s;
@@ -36,6 +36,13 @@ const Guess = ({theme, add_time, total_time}) => {
 
     const check = () => {
         console.log(guess);
+        if (ans.length != guess.length) {
+            setAlertmessage("輸入長度應該為4!!!");
+            setSeverity('error');
+            setShowmessage(true);
+            closeAlert();
+            return;
+        }
         let a_cnt = 0, b_cnt = 0;
         for (let i = 0; i < guess.length; ++i) {
             if (!(guess.charCodeAt(i) >= 48 && guess.charCodeAt(i) <= 57)) {
