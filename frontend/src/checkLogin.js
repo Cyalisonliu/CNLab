@@ -1,7 +1,7 @@
 const checkLogin = async () => {
     let username = localStorage.getItem("username");
     if(username) {
-        return false;
+        return true;
     }
     else return false;
 }

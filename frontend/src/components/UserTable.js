@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button, Grid, Box, InputAdornment, FormControl, OutlinedInput, Typography,
     TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TextField, 
-    ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogTitle
+    ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogTitle, Alert
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -10,25 +10,29 @@ import ClearIcon from '@mui/icons-material/Clear';
 import IconButton from '@mui/material/IconButton';
 import instance from '../instance';
 
-export default function UserTable() {
+const TEMPLATE = [
+    { label: 'Sudoku', id: 0 }, { label: 'Tic Tac Toe', id: 1 },
+    { label: 'Number Guess', id: 2 },
+]
+
+const UserTable = ({users, setUsers, template}) => {
     const [task, setTask] = React.useState('');
     const [open, setOpen] = React.useState(false);
-    const [users, setUsers] = React.useState([]);
     const [showrows, setShowrows] = React.useState([]);
     // const [limitTraffic, setLimitTraffic] = React.useState(null);
     // const [limitTime, setLimitTime] = React.useState(null);
     const [searchTerm, setSearchTerm] = React.useState('');
     const [currentuser, setCurrentuser] = React.useState('');
-    const [currentLimitTraffic, setCurrentLimitTraffic] = React.useState(0);
+    // const [currentLimitTraffic, setCurrentLimitTraffic] = React.useState(0);
     const [currentLimitTime, setCurrentLimitTime] = React.useState(0);
     // for sign up new user
     const [values, setValues] = React.useState({
         username: '',
         password: '',
-        traffic: 0,
+        // traffic: 0,
         time: 0,
-        limitTraffic: 0,
-        limitTime: 0,
+        // limitTraffic: 0,
+        limitTime: 1,
     });
 
     // search function
@@ -57,7 +61,7 @@ export default function UserTable() {
     const handleEditOpen = (row) => {
         // setCurrentId(row.id);
         setCurrentuser(row.username);
-        setCurrentLimitTraffic(row.limitTraffic);
+        // setCurrentLimitTraffic(row.limitTraffic);
         setCurrentLimitTime(row.limitTime);
         setTask('edit');
         setOpen(true);
@@ -114,12 +118,12 @@ export default function UserTable() {
             handleClose();
         }
         else {
-            handleUpdateTraffic(currentuser, currentLimitTraffic);
+            // handleUpdateTraffic(currentuser, currentLimitTraffic);
             handleUpdateTime(currentuser, currentLimitTime)
             // setUsers(users.concat(values));
             const newState = showrows.map(obj => {
                 if (obj.username === currentuser) {
-                    return { ...obj, limitTraffic: currentLimitTraffic, limitTime: currentLimitTime };
+                    return { ...obj, limitTime: currentLimitTime }; //limitTraffic: currentLimitTraffic,
                 }
                 return obj;
             });
@@ -148,7 +152,6 @@ export default function UserTable() {
             const res = await instance.post(`/insertRadcheck`, {
                 username: form.username, 
                 password: form.password,
-                limitTraffic: form.limitTraffic,
                 limitTime: form.limitTime,
             });
             if (res.status === 200) {
@@ -160,30 +163,46 @@ export default function UserTable() {
         } catch (error) {
             console.log("Failed");
         }
-    };
-    
-    const handleUpdateTraffic = (username, currentLimitTime) => {
-        console.log(currentLimitTime);
-        updateTraffic(username, currentLimitTime);
-    }
-    const updateTraffic = async(username, currentLimitTraffic) => {
-        // INSERT INTO radcheck
+        // INSERT INTO uerinfo
         try {
-            const res = await instance.put(`/update/traffic`, {
-                username: username, 
-                limitTraffic: currentLimitTraffic,
+            const res = await instance.post(`/insertUerinfo`, {
+                username: form.username, 
+                template: template
             });
             if (res.status === 200) {
-                console.log("Set traffic successfully");
+                console.log("Success");
                 console.log(res.data);
             }
             else {
-                console.log("Set traffic Failed");
+                console.log("Failed");
             }
         } catch (error) {
-            console.log("Set traffic Failed");
+            console.log("Failed");
         }
     };
+    
+    // const handleUpdateTraffic = (username, currentLimitTime) => {
+    //     console.log(currentLimitTime);
+    //     updateTraffic(username, currentLimitTime);
+    // }
+    // const updateTraffic = async(username, currentLimitTraffic) => {
+    //     // INSERT INTO radcheck
+    //     try {
+    //         const res = await instance.put(`/update/traffic`, {
+    //             username: username, 
+    //             limitTraffic: currentLimitTraffic,
+    //         });
+    //         if (res.status === 200) {
+    //             console.log("Set traffic successfully");
+    //             console.log(res.data);
+    //         }
+    //         else {
+    //             console.log("Set traffic Failed");
+    //         }
+    //     } catch (error) {
+    //         console.log("Set traffic Failed");
+    //     }
+    // };
 
     const handleUpdateTime = (username, currentLimitTime) => {
         console.log(currentLimitTime);
@@ -220,20 +239,22 @@ export default function UserTable() {
                     let user = data[i].username;
                     if(data[i].attribute == 'Cleartext-Password') {
                         userform = {...userform, id: uid, username: user};
-                        const res_traffic = await instance.get(`/traffic?username=${user}`);
-                        if (res_traffic.status === 200) {
-                            const data_traffic = res_traffic.data[0];
-                            for (const property in data_traffic) {
-                                if (String(property) === 'IFNULL( SUM(acctinputoctets) + SUM(acctoutputoctets),0)') {
-                                    userform = {...userform, traffic: data_traffic[property]};
-                                }
-                            }
+                        const res_template = await instance.get(`/questions?username=${user}`);
+                        if (res_template.status === 200) {
+                            const data_template = res_template.data[0].template_id;
+                            userform = {...userform, template_id: data_template};
                         } else {
-                            console.log("Get traffic failed");
+                            console.log("Get questions template failed");
                         }
-                        const res_time = await instance.get(`/time?username=${user}`, {
-                            username: user,
-                        });
+                        const addtime = await instance.get(`/addtime?username=${user}`);
+                        if (addtime.status === 200) {
+                            const data_addtime = addtime.data[0].add_time;
+                            userform = {...userform, add_time: data_addtime};
+                        } else {
+                            console.log("Get add_time failed");
+                        }
+
+                        const res_time = await instance.get(`/time?username=${user}`);
                         if (res_time.status === 200) {
                             console.log(res_time.data);
                             const data_time = res_time.data[0];
@@ -243,21 +264,20 @@ export default function UserTable() {
                                 }
                             }
                         } else {
-                            console.log("Get traffic failed");
+                            console.log("Get time failed");
                         }
                         userarr = [...userarr, userform];
                     }
-                    else if(data[i].attribute == 'Max-Bytes') {
-                        userarr.forEach(object => {
-                            console.log(object['username'])
-                            if (object['username'] == data[i].username) {
-                                object['limitTraffic'] = data[i].value;
-                            }
-                          });
-                    }
+                    // else if(data[i].attribute == 'Max-Bytes') {
+                    //     userarr.forEach(object => {
+                    //         console.log(object['username'])
+                    //         if (object['username'] == data[i].username) {
+                    //             object['limitTraffic'] = data[i].value;
+                    //         }
+                    //       });
+                    // }
                     else if(data[i].attribute == 'Expire-After') {
                         userarr.forEach(object => {
-                            console.log(object['username'])
                             if (object['username'] == data[i].username) {
                                 object['limitTime'] = data[i].value;
                             }
@@ -284,73 +304,83 @@ export default function UserTable() {
 
     return (
         <React.Fragment>
-            <Grid
-                container
-                justifyContent="space-between"
-            >
-                <FormControl sx={{ml: 1, mb: 2}}>
-                    <OutlinedInput
-                        value={searchTerm}
-                        onChange={handleSearch}
-                        startAdornment={
-                            <InputAdornment position="start"><SearchIcon /></InputAdornment>
-                        }
-                        endAdornment={
-                            <InputAdornment position="end">
-                                <IconButton>
-                                    <ClearIcon onClick={cancelSearch}/>
-                                </IconButton>
-                            </InputAdornment>
-                        }
-                        placeholder="Search Username"
-                    />
-                </FormControl>
-            </Grid>
-            <TableContainer sx={{}}>
-                <Table size="normal">
-                    <TableHead>
-                    <TableRow>
-                        <TableCell>USER NAME</TableCell>
-                        <TableCell>TRAFFIC / MAX USAGE</TableCell>
-                        <TableCell>TIME / MAX USAGE</TableCell>
-                        <TableCell align="right">EDIT / DELETE USER</TableCell>
-                    </TableRow>
-                    </TableHead>
-                    <TableBody>
-                    {showrows.map((row) => (
-                        <TableRow key={row.id}>
-                        <TableCell>{row.username}</TableCell>
-                        <TableCell>{row.traffic}/{row.limitTraffic}</TableCell>
-                        <TableCell>{row.time}/{row.limitTime}</TableCell>
-                        <TableCell align="right">
-                            <>
-                                <IconButton edge="start" onClick={() => handleEditOpen(row)}><EditIcon color='secondary'/></IconButton>
-                                <IconButton edge="end" onClick={() => handleDeleteUser(row.username)}><DeleteIcon/></IconButton>
-                            </>
-                        </TableCell>
+            <Box sx={{ p: 1, display: 'flex', flexDirection: 'column' }}>
+                <Grid
+                    container
+                    justifyContent="space-between"
+                    alignItems="center"
+                >
+                    <FormControl sx={{ml: 1, mb: 2}}>
+                        <OutlinedInput
+                            sx={{borderRadius: 3}}
+                            value={searchTerm}
+                            onChange={handleSearch}
+                            startAdornment={
+                                <InputAdornment position="start"><SearchIcon /></InputAdornment>
+                            }
+                            endAdornment={
+                                <InputAdornment position="end">
+                                    <IconButton>
+                                        <ClearIcon onClick={cancelSearch}/>
+                                    </IconButton>
+                                </InputAdornment>
+                            }
+                            placeholder="Search Username"
+                        />
+                    </FormControl>
+                    <Button item onClick={handleClickOpen} sx={{padding: '6px 16px'}}>Add New User</Button>
+                </Grid>
+                <TableContainer>
+                    <Table size="normal">
+                        <TableHead>
+                        <TableRow>
+                            <TableCell>USER NAME</TableCell>
+                            {/* <TableCell>TRAFFIC / MAX USAGE</TableCell> */}
+                            <TableCell>TIME / MAX USAGE</TableCell>
+                            <TableCell align="right">EDIT / DELETE USER</TableCell>
                         </TableRow>
-                    ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <Grid
-                container
-                justifyContent="space-between"
-            >
-                <Button sx={{mt: 2}} item onClick={handleClickOpen}>Add New User</Button>
-            </Grid>
+                        </TableHead>
+                        <TableBody>
+                        {showrows.map((row) => (
+                            <TableRow key={row.id}>
+                            <TableCell>{row.username}</TableCell>
+                            {/* <TableCell>{row.traffic}/{row.limitTraffic}</TableCell> */}
+                            <TableCell>{row.time}/{row.limitTime}</TableCell>
+                            <TableCell align="right">
+                                <>
+                                    <IconButton edge="start" onClick={() => handleEditOpen(row)}><EditIcon color='secondary'/></IconButton>
+                                    <IconButton edge="end" onClick={() => handleDeleteUser(row.username)}><DeleteIcon/></IconButton>
+                                </>
+                            </TableCell>
+                            </TableRow>
+                        ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                {/* <Grid
+                    container
+                    justifyContent="space-between"
+                    sx={{display: 'flex', flexDirection: 'row-reverse'}}
+                >
+                    <Button sx={{mt: 2}} item onClick={handleClickOpen}>Add New User</Button>
+                </Grid> */}
+            </Box>
             {/* edit user info or create new user */}
             <Dialog
                 open={open}
                 onClose={handleClose}
                 sx={{p: '3'}}
             >
-                <DialogTitle id="alert-dialog-title">
+                <DialogTitle>
                 { task === 'create' ? "ADD NEW USER" : "SET TRAFFIC OR TIME LIMIT" }
                 </DialogTitle>
-                <DialogContent sx={{m: 2}}>
+                <DialogContent sx={{mr: 2, ml: 2}}>
                     {task === 'create' ? 
                     <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                        <Alert severity='info' sx={{mb: 1}}>
+                            {`Note that the question for users is now ${TEMPLATE[template].label}. You can change to other question in `}
+                            <b>{"QUESTION SETTING"}</b>
+                        </Alert>
                         <ListItem sx={{ display: 'grid', gridAutoColumns: '1fr'}}>
                             <ListItemText sx={{ gridColumn: '1/4' }} id="username-label" primary="Username" />
                             <TextField
@@ -375,20 +405,9 @@ export default function UserTable() {
                                 value={values.password}
                                 onChange={handleChange('password')}
                             />
-                        </ListItem>  
+                        </ListItem>
                         <ListItem sx={{ display: 'grid', gridAutoColumns: '1fr'}}>
-                            <ListItemText sx={{ gridColumn: '1/4' }} id="traffic-label" primary="Traffic Limit" />
-                            <TextField
-                                sx={{ gridColumn: '5/12' }}
-                                size="small"
-                                type="text"
-                                label="Traffic Limit(Bytes)"
-                                value={values.limitTraffic}
-                                onChange={handleChange('limitTraffic')}
-                            />
-                        </ListItem>    
-                        <ListItem sx={{ display: 'grid', gridAutoColumns: '1fr'}}>
-                            <ListItemText sx={{ gridColumn: '1/4' }} id="traffic-label" primary="Time Limit" />
+                            <ListItemText sx={{ gridColumn: '1/4' }} id="time-label" primary="Time Limit" />
                             <TextField
                                 sx={{ gridColumn: '5/12' }}
                                 size="small"
@@ -405,7 +424,7 @@ export default function UserTable() {
                             <ListItemText sx={{ gridColumn: '1/4' }} id="username-label" primary="Username" />
                             <Typography sx={{ gridColumn: '5/12' }}>{currentuser}</Typography>
                         </ListItem>
-                        <ListItem sx={{ display: 'grid', gridAutoColumns: '1fr' }}>
+                        {/* <ListItem sx={{ display: 'grid', gridAutoColumns: '1fr' }}>
                             <ListItemText sx={{ gridColumn: '1/4' }} id="traffic-label" primary="Traffic Limit" />
                             <TextField
                                 sx={{ gridColumn: '5/12' }}
@@ -415,7 +434,7 @@ export default function UserTable() {
                                 type="text"
                                 onChange={(e) => setCurrentLimitTraffic(e.target.value)}
                             />
-                        </ListItem>
+                        </ListItem> */}
                         <ListItem sx={{ display: 'grid', gridAutoColumns: '1fr' }}>
                             <ListItemText sx={{ gridColumn: '1/4' }} id="time-label" primary="Time Limit" />
                             <TextField
@@ -432,9 +451,10 @@ export default function UserTable() {
                 </DialogContent>
                 <DialogActions sx={{p: '20px'}}>
                     <Button onClick={handleClose}>CANCEL</Button>
-                    <Button variant='contained' onClick={handleSubmit} autoFocus>SUBMIT</Button>
+                    <Button variant='contained' onClick={handleSubmit} autoFocus>ADD</Button>
                 </DialogActions>
             </Dialog>
         </React.Fragment>
     );
 }
+export default UserTable;

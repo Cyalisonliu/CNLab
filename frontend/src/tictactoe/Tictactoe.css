@@ -1,0 +1,14 @@
+div.board{
+  display: grid;
+  border: 2px solid #000000;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+}
+div.square{
+  width: 100px;
+  height: 100px;
+  border: 2px solid #000000;
+  box-sizing: border-box;
+  font-size: 4rem;
+  text-align: center;
+}
