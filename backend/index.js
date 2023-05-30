@@ -41,12 +41,11 @@ app.listen(port, () => {
 app.post('/insertRadcheck', (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
-    const limitTraffic = req.body.limitTraffic;
+    // const limitTraffic = req.body.limitTraffic;
     const limitTime = req.body.limitTime;
     db.query(
         `INSERT INTO radcheck (username, attribute, op, value) VALUES \
         ('${username}', 'Cleartext-Password', ':=', '${password}'), \
-        ('${username}', 'Max-Bytes', ':=', '${limitTraffic}'), \
         ('${username}', 'Expire-After', ':=', '${limitTime}') \
         `, (err, result) => {
             if (err) {
@@ -74,9 +73,35 @@ app.post('/insertRaduse', (req, res) => {
     )
 });
 
+app.post('/insertUerinfo', (req, res) => {
+    const username = req.body.username;
+    const template = req.body.template;
+    db.query(
+        `INSERT INTO userinfo (username, template_id) VALUES ('${username}', '${template}')`
+        , (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send("User inserted.");
+            }
+        }
+    )
+});
+
+
 // Get all user in database
 app.get('/users', (req, res) => {
     db.query("SELECT * FROM radcheck", (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.send(result);
+        }
+    })
+})
+
+app.get('/managers', (req, res) => {
+    db.query("SELECT * FROM managerinfo", (err, result) => {
         if (err) {
             console.log(err);
         } else {
@@ -89,20 +114,20 @@ app.get('/users', (req, res) => {
 // SELECT IFNULL(SUM(acctinputoctets) + SUM(acctoutputoctets), 0)
 // FROM radacct
 // WHERE username = '<username>';
-app.get('/traffic', (req, res) => {
-    const username = req.query.username;
-    db.query(
-        `SELECT IFNULL( SUM(acctinputoctets) + SUM(acctoutputoctets),0) \
-        FROM radacct \
-        WHERE username = '${username}'`,
-        (err, result) => {
-            if (err) {
-                console.log(err);
-            } else {
-                res.send(result);
-            }
-    })
-})
+// app.get('/traffic', (req, res) => {
+//     const username = req.query.username;
+//     db.query(
+//         `SELECT IFNULL( SUM(acctinputoctets) + SUM(acctoutputoctets),0) \
+//         FROM radacct \
+//         WHERE username = '${username}'`,
+//         (err, result) => {
+//             if (err) {
+//                 console.log(err);
+//             } else {
+//                 res.send(result);
+//             }
+//     })
+// })
 
 // -- Get total time (in seconds) used
 // SELECT SUM(total_time)
@@ -118,7 +143,6 @@ app.get('/traffic', (req, res) => {
 app.get('/time', (req, res) => {
     const username = req.query.username;
 
-    console.log(username);
     db.query(
         `SELECT SUM(total_time)
         FROM (
@@ -139,17 +163,12 @@ app.get('/time', (req, res) => {
     })
 })
 
-// -- Update user's data limit
-// UPDATE radcheck
-// SET value = '<new data limit>'
-// WHERE username = '<username>' AND attribute = 'Max-Bytes';
-app.put('/update/traffic', (req, res) => {
-    const username = req.body.username;
-    const limitTraffic = req.body.limitTraffic;
+// get questions template id
+app.get('/questions', (req, res) => {
+    const username = req.query.username;
+
     db.query(
-        `UPDATE radcheck \
-        SET value = '${limitTraffic}' \
-        WHERE username = '${username}' AND attribute = 'Max-Bytes'`,
+        `SELECT template_id FROM userinfo WHERE username = '${username}'`,
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -158,6 +177,40 @@ app.put('/update/traffic', (req, res) => {
             }
     })
 })
+
+app.get('/addtime', (req, res) => {
+    const username = req.query.username;
+
+    db.query(
+        `SELECT add_time FROM userinfo WHERE username = '${username}'`,
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(result);
+            }
+    })
+})
+
+// -- Update user's data limit
+// UPDATE radcheck
+// SET value = '<new data limit>'
+// WHERE username = '<username>' AND attribute = 'Max-Bytes';
+// app.put('/update/traffic', (req, res) => {
+//     const username = req.body.username;
+//     const limitTraffic = req.body.limitTraffic;
+//     db.query(
+//         `UPDATE radcheck \
+//         SET value = '${limitTraffic}' \
+//         WHERE username = '${username}' AND attribute = 'Max-Bytes'`,
+//         (err, result) => {
+//             if (err) {
+//                 console.log(err);
+//             } else {
+//                 res.send(result);
+//             }
+//     })
+// })
 
 // -- Update user's data limit
 // UPDATE radcheck
@@ -170,6 +223,70 @@ app.put('/update/time', (req, res) => {
         `UPDATE radcheck \
         SET value = '${limitTime}' \
         WHERE username = '${username}' AND attribute = 'Expire-After'`,
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(result);
+            }
+    })
+})
+
+app.put('/update/question', (req, res) => {
+    const username = req.body.username;
+    const curtemplate = req.body.curtemplate;
+    db.query(
+        `UPDATE userinfo \
+        SET template_id = ${curtemplate} \
+        WHERE username = '${username}'`,
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(result);
+            }
+    })
+})
+
+app.put('/update/addtime', (req, res) => {
+    const username = req.body.username;
+    const curAddtime = req.body.curAddtime;
+    console.log(req);
+    db.query(
+        `UPDATE userinfo \
+        SET add_time = '${curAddtime}' \
+        WHERE username = '${username}'`,
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(result);
+            }
+    })
+})
+
+app.put('/update/manager/template', (req, res) => {
+    const username = req.body.username;
+    const curtemplate = req.body.curtemplate;
+    db.query(
+        `UPDATE managerinfo \
+        SET template_id = '${curtemplate}'\
+        WHERE username = '${username}'`,
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(result);
+            }
+    })
+})
+app.put('/update/manager/addtime', (req, res) => {
+    const username = req.body.username;
+    const curAddtime = req.body.curAddtime;
+    db.query(
+        `UPDATE managerinfo \
+        SET add_time = '${curAddtime}'\
+        WHERE username = '${username}'`,
         (err, result) => {
             if (err) {
                 console.log(err);

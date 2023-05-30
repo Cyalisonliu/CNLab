@@ -168,3 +168,30 @@ CREATE TABLE IF NOT EXISTS nas (
   PRIMARY KEY (id),
   KEY nasname (nasname)
 );
+
+#
+# Table structure for table 'userinfo'
+#
+CREATE TABLE IF NOT EXISTS userinfo (
+  id int(11) NOT NULL auto_increment,
+  username varchar(64) NOT NULL default '',
+  template_id INT NOT NULL default 0,
+  add_time varchar(253) NOT NULL default '',
+  PRIMARY KEY (id),
+  KEY username (username)
+);
+
+#
+# Table structure for table 'manager'
+#
+CREATE TABLE IF NOT EXISTS managerinfo (
+  id int(11) NOT NULL auto_increment,
+  username varchar(64) NOT NULL default 'root',
+  pass varchar(64) NOT NULL default '0000',
+  template_id INT NOT NULL default 0,
+  add_time varchar(253) NOT NULL default '',
+  PRIMARY KEY (id),
+  KEY username (username)
+);
+INSERT INTO managerinfo (username, pass, template_id, add_time)
+  VALUES ("root", "0000", 0, '0.5');
