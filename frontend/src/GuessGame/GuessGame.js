@@ -14,7 +14,7 @@ function genRandom(x) {
     for (var i = 0; i < x; ++i) {
         let d = Math.floor(Math.random() * arr.length);
         s = s + arr[d];
-        arr.splice(d, d);
+        arr.splice(d, 1);
     }
     console.log(s);
     return s;

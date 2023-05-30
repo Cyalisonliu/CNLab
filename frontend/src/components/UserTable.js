@@ -15,7 +15,7 @@ const TEMPLATE = [
     { label: 'Number Guess', id: 2 },
 ]
 
-const UserTable = ({users, setUsers, template}) => {
+const UserTable = ({users, setUsers, addtime, template}) => {
     const [task, setTask] = React.useState('');
     const [open, setOpen] = React.useState(false);
     const [showrows, setShowrows] = React.useState([]);
@@ -167,7 +167,8 @@ const UserTable = ({users, setUsers, template}) => {
         try {
             const res = await instance.post(`/insertUerinfo`, {
                 username: form.username, 
-                template: template
+                template: template,
+                addtime: addtime
             });
             if (res.status === 200) {
                 console.log("Success");
@@ -180,33 +181,9 @@ const UserTable = ({users, setUsers, template}) => {
             console.log("Failed");
         }
     };
-    
-    // const handleUpdateTraffic = (username, currentLimitTime) => {
-    //     console.log(currentLimitTime);
-    //     updateTraffic(username, currentLimitTime);
-    // }
-    // const updateTraffic = async(username, currentLimitTraffic) => {
-    //     // INSERT INTO radcheck
-    //     try {
-    //         const res = await instance.put(`/update/traffic`, {
-    //             username: username, 
-    //             limitTraffic: currentLimitTraffic,
-    //         });
-    //         if (res.status === 200) {
-    //             console.log("Set traffic successfully");
-    //             console.log(res.data);
-    //         }
-    //         else {
-    //             console.log("Set traffic Failed");
-    //         }
-    //     } catch (error) {
-    //         console.log("Set traffic Failed");
-    //     }
-    // };
 
     const handleUpdateTime = (username, currentLimitTime) => {
-        console.log(currentLimitTime);
-        updateTime(username, currentLimitTime);
+        updateTime(username, Number(currentLimitTime)*3600);
     }
     const updateTime = async(username, currentLimitTime) => {
         // INSERT INTO radcheck
@@ -232,6 +209,7 @@ const UserTable = ({users, setUsers, template}) => {
             const res = await instance.get(`/users`);
             if (res.status === 200) {
                 let userarr = []
+                console.log(res.data)
                 const data = res.data;
                 for (let i = 0; i < data.length; i++) {
                     let userform = {};
@@ -260,7 +238,7 @@ const UserTable = ({users, setUsers, template}) => {
                             const data_time = res_time.data[0];
                             for (const property in data_time) {
                                 if (String(property) === 'SUM(total_time)') {
-                                    userform = {...userform, time: data_time[property]};
+                                    userform = {...userform, time: (Number(data_time[property])/3600).toFixed(2)};
                                 }
                             }
                         } else {
@@ -279,7 +257,7 @@ const UserTable = ({users, setUsers, template}) => {
                     else if(data[i].attribute == 'Expire-After') {
                         userarr.forEach(object => {
                             if (object['username'] == data[i].username) {
-                                object['limitTime'] = data[i].value;
+                                object['limitTime'] = (Number(data[i].value)/3600).toFixed(2);
                             }
                           });
                     }
@@ -336,7 +314,7 @@ const UserTable = ({users, setUsers, template}) => {
                         <TableRow>
                             <TableCell>USER NAME</TableCell>
                             {/* <TableCell>TRAFFIC / MAX USAGE</TableCell> */}
-                            <TableCell>TIME / MAX USAGE</TableCell>
+                            <TableCell>TIME / MAX USAGE (Hours)</TableCell>
                             <TableCell align="right">EDIT / DELETE USER</TableCell>
                         </TableRow>
                         </TableHead>
@@ -378,7 +356,7 @@ const UserTable = ({users, setUsers, template}) => {
                     {task === 'create' ? 
                     <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
                         <Alert severity='info' sx={{mb: 1}}>
-                            {`Note that the question for users is now ${TEMPLATE[template].label}. You can change to other question in `}
+                            {`Note that the question for users is now ${TEMPLATE[template].label}. Add-time is ${addtime} You can change to other question in `}
                             <b>{"QUESTION SETTING"}</b>
                         </Alert>
                         <ListItem sx={{ display: 'grid', gridAutoColumns: '1fr'}}>
@@ -412,7 +390,7 @@ const UserTable = ({users, setUsers, template}) => {
                                 sx={{ gridColumn: '5/12' }}
                                 size="small"
                                 type="text"
-                                label="Time Limit(Seconds)"
+                                label="Time Limit(Hours)"
                                 value={values.limitTime}
                                 onChange={handleChange('limitTime')}
                             />
@@ -440,7 +418,7 @@ const UserTable = ({users, setUsers, template}) => {
                             <TextField
                                 sx={{ gridColumn: '5/12' }}
                                 size="small"
-                                label="Time Limit(Seconds)"
+                                label="Time Limit(Hours)"
                                 value={currentLimitTime}
                                 type="text"
                                 onChange={(e) => setCurrentLimitTime(e.target.value)}

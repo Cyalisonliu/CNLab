@@ -7,11 +7,11 @@ import instance from "../instance";
 const defaultSquares = () => (new Array(9)).fill(null);
 
 const handleUpdateTime = (username, currentLimitTime) => {
-    console.log(currentLimitTime);
-    updateTime(username, currentLimitTime);
+    updateTime(username, (currentLimitTime).toFixed());
 }
 const updateTime = async(username, currentLimitTime) => {
-    // INSERT INTO radcheck
+    // INSERT INTO 
+    console.log(currentLimitTime);
     try {
         const res = await instance.put(`/update/time`, {
             username: username, 
@@ -32,7 +32,9 @@ const updateTime = async(username, currentLimitTime) => {
 export const EndModal = ({theme, isPlayerWon, show, setShow, add_time, total_time}) => {
 
     const handleClose = () => {
-        handleUpdateTime(localStorage.getItem('username'), Number(add_time)+total_time);
+        console.log(Number(add_time)*3600, Number(total_time))
+        let time = (Number(add_time)+Number(total_time))*3600
+        handleUpdateTime(localStorage.getItem('username'), time);
         setShow(false);
     }
     return (
@@ -74,8 +76,10 @@ export const EndModal = ({theme, isPlayerWon, show, setShow, add_time, total_tim
 
 export const InfoModal = ({theme, isPlayerWon, setSquares, add_time, total_time}) => {
     const [show, setShow] = useState(true);
+    console.log(Number(add_time)*3600, Number(total_time))
+    let time = (Number(add_time)+Number(total_time))*3600
     const handleClose = () => {
-        handleUpdateTime(localStorage.getItem('username'), Number(add_time)+total_time);
+        handleUpdateTime(localStorage.getItem('username'), time);
         setShow(false);
         setSquares(defaultSquares());
     }
@@ -139,8 +143,10 @@ export const SolutionModal = ({theme, show, setShow, add_time, total_time}) => {
 
 export const GuessModal = ({theme, add_time, total_time}) => {
     const [show, setShow] = useState(true);
+    console.log(Number(add_time)*3600, Number(total_time))
+    let time = (Number(add_time)+Number(total_time))*3600
     const handleClose = () => {
-        handleUpdateTime(localStorage.getItem('username'), Number(add_time)+total_time);
+        handleUpdateTime(localStorage.getItem('username'), time);
         setShow(false);
     }
     return (

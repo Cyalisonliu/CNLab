@@ -54,6 +54,8 @@ const LoginForm = ({identity, setIdentity, setLogin, theme, setTemplate, setAddT
                 if (values.username === info.username && values.password === info.pass) {
                     localStorage.setItem("username", info.username);
                     localStorage.setItem("identity", identity);
+                    localStorage.setItem("template_id", info.template_id);
+                    localStorage.setItem("add_time", info.add_time);
                     setTemplate(info.template_id);
                     setAddTime(info.add_time);
                     setLogin(true);
@@ -95,7 +97,7 @@ const LoginForm = ({identity, setIdentity, setLogin, theme, setTemplate, setAddT
             if (res.status === 200) {
                 let userarr = []
                 const data = res.data;
-                console.log(data);
+                console.log(res);
                 setManagerinfo(...managerinfo, data);
             }
             else {
@@ -138,7 +140,7 @@ const LoginForm = ({identity, setIdentity, setLogin, theme, setTemplate, setAddT
                             const data_time = res_time.data[0];
                             for (const property in data_time) {
                                 if (String(property) === 'SUM(total_time)') {
-                                    userform = {...userform, time: data_time[property]};
+                                    userform = {...userform, time: (Number(data_time[property])/3600).toFixed(2)};
                                 }
                             }
                         } else {
@@ -150,7 +152,7 @@ const LoginForm = ({identity, setIdentity, setLogin, theme, setTemplate, setAddT
                         userarr.forEach(object => {
                             console.log(object['username'])
                             if (object['username'] == data[i].username) {
-                                object['limitTime'] = data[i].value;
+                                object['limitTime'] = (Number(data[i].value)/3600).toFixed(2);
                             }
                           });
                     }

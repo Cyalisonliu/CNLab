@@ -14,8 +14,8 @@ const QuestionSetting = ({template, setTemplate, users, addTime, setAddTime}) =>
     // for setting question
     const [open, setOpen] = React.useState(false);
     const [edit, setEdit] = useState(false);
-    const [currentTemplate, setCurrentTemplate] = useState(template);
-    const [currentAddtime, setCurrentAddtime] = useState(addTime);
+    const [currentTemplate, setCurrentTemplate] = useState(localStorage.getItem('template_id')? localStorage.getItem('template_id'): template);
+    const [currentAddtime, setCurrentAddtime] = useState(localStorage.getItem('add_time')? localStorage.getItem('add_time'): addTime);
     
     const handleClickOpen = () => {
         setOpen(true);
@@ -30,6 +30,8 @@ const QuestionSetting = ({template, setTemplate, users, addTime, setAddTime}) =>
         setAddTime(currentAddtime);
         for (let i = 0; i < users.length; i++) {
             let currentuser = users[i];
+            localStorage.setItem("template_id", currentTemplate);
+            localStorage.setItem("add_time", currentAddtime);
             handleUpdateQuestion(currentuser.username, currentTemplate);
             handleUpdateAddtime(currentuser.username, currentAddtime);
             handleUpdateManager(localStorage.getItem("username"), currentTemplate, currentAddtime);

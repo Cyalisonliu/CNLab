@@ -76,8 +76,9 @@ app.post('/insertRaduse', (req, res) => {
 app.post('/insertUerinfo', (req, res) => {
     const username = req.body.username;
     const template = req.body.template;
+    const addtime = req.body.addtime;
     db.query(
-        `INSERT INTO userinfo (username, template_id) VALUES ('${username}', '${template}')`
+        `INSERT INTO userinfo (username, template_id, add_time) VALUES ('${username}', '${template}', '${addtime}')`
         , (err, result) => {
             if (err) {
                 console.log(err);
