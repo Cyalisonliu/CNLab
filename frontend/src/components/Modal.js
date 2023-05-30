@@ -4,6 +4,10 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle
 } from '@mui/material';
 import instance from "../instance";
 
+function refreshPage() {
+    window.location.reload(false);
+}
+
 const defaultSquares = () => (new Array(9)).fill(null);
 
 const handleUpdateTime = (username, currentLimitTime) => {
@@ -27,12 +31,13 @@ const updateTime = async(username, currentLimitTime) => {
     } catch (error) {
         console.log("Update Failed");
     }
+    refreshPage();
 };
 
 export const EndModal = ({theme, isPlayerWon, show, setShow, add_time, total_time}) => {
 
     const handleClose = () => {
-        console.log(Number(add_time)*3600, Number(total_time))
+        console.log(Number(add_time)*3600, Number(total_time)*3600)
         let time = (Number(add_time)+Number(total_time))*3600
         handleUpdateTime(localStorage.getItem('username'), time);
         setShow(false);
@@ -76,7 +81,7 @@ export const EndModal = ({theme, isPlayerWon, show, setShow, add_time, total_tim
 
 export const InfoModal = ({theme, isPlayerWon, setSquares, add_time, total_time}) => {
     const [show, setShow] = useState(true);
-    console.log(Number(add_time)*3600, Number(total_time))
+    console.log(Number(add_time)*3600, Number(total_time)*3600)
     let time = (Number(add_time)+Number(total_time))*3600
     const handleClose = () => {
         handleUpdateTime(localStorage.getItem('username'), time);
@@ -143,7 +148,7 @@ export const SolutionModal = ({theme, show, setShow, add_time, total_time}) => {
 
 export const GuessModal = ({theme, add_time, total_time}) => {
     const [show, setShow] = useState(true);
-    console.log(Number(add_time)*3600, Number(total_time))
+    console.log(Number(add_time)*3600, Number(total_time)*3600)
     let time = (Number(add_time)+Number(total_time))*3600
     const handleClose = () => {
         handleUpdateTime(localStorage.getItem('username'), time);

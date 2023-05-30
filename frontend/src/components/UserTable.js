@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Grid, Box, InputAdornment, FormControl, OutlinedInput, Typography,
     TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TextField, 
     ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogTitle, Alert
@@ -15,18 +15,23 @@ const TEMPLATE = [
     { label: 'Number Guess', id: 2 },
 ]
 
-const UserTable = ({users, setUsers, addtime, template}) => {
-    const [task, setTask] = React.useState('');
-    const [open, setOpen] = React.useState(false);
-    const [showrows, setShowrows] = React.useState([]);
-    // const [limitTraffic, setLimitTraffic] = React.useState(null);
-    // const [limitTime, setLimitTime] = React.useState(null);
-    const [searchTerm, setSearchTerm] = React.useState('');
-    const [currentuser, setCurrentuser] = React.useState('');
-    // const [currentLimitTraffic, setCurrentLimitTraffic] = React.useState(0);
-    const [currentLimitTime, setCurrentLimitTime] = React.useState(0);
+function refreshPage() {
+    window.location.reload(false);
+}
+const UserTable = ({users, setUsers, addtime, temp}) => {
+    const [task, setTask] = useState('');
+    const [open, setOpen] = useState(false);
+    const [showrows, setShowrows] = useState([]);
+    // const [limitTraffic, setLimitTraffic] = useState(null);
+    // const [limitTime, setLimitTime] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentuser, setCurrentuser] = useState('');
+    // const [currentLimitTraffic, setCurrentLimitTraffic] = useState(0);
+    const [currentLimitTime, setCurrentLimitTime] = useState(0);
+    const [template, setTemplate] = useState(localStorage.getItem("template_id") ? localStorage.getItem("template_id") : temp);
+    const [addTime, setAddTime] = useState(localStorage.getItem("add_time") ? localStorage.getItem("add_time") : addtime);
     // for sign up new user
-    const [values, setValues] = React.useState({
+    const [values, setValues] = useState({
         username: '',
         password: '',
         // traffic: 0,
@@ -103,6 +108,25 @@ const UserTable = ({users, setUsers, addtime, template}) => {
         } catch (error) {
             console.log("Delete from radusegroup Failed");
         }
+        try {
+            const res = await instance.delete(`/delete/userinfo/${username}`);
+            if (res.status === 200) {
+                console.log("Delete from userinfo successfully");
+                console.log(res.data);
+                setUsers(users.filter((val) => {
+                    return val.username !== username;
+                }));
+                setShowrows(showrows.filter((val) => {
+                    return val.username !== username;
+                }));
+            }
+            else {
+                console.log("Delete from userinfo Failed");
+            }
+        } catch (error) {
+            console.log("Delete from userinfo Failed");
+        }
+        refreshPage();
     }
 
     const handleChange = (prop) => (event) => {
@@ -152,7 +176,7 @@ const UserTable = ({users, setUsers, addtime, template}) => {
             const res = await instance.post(`/insertRadcheck`, {
                 username: form.username, 
                 password: form.password,
-                limitTime: form.limitTime,
+                limitTime: Number(form.limitTime)*3600,
             });
             if (res.status === 200) {
                 console.log("Success");
@@ -168,7 +192,7 @@ const UserTable = ({users, setUsers, addtime, template}) => {
             const res = await instance.post(`/insertUerinfo`, {
                 username: form.username, 
                 template: template,
-                addtime: addtime
+                addtime: addTime
             });
             if (res.status === 200) {
                 console.log("Success");
@@ -180,6 +204,7 @@ const UserTable = ({users, setUsers, addtime, template}) => {
         } catch (error) {
             console.log("Failed");
         }
+        refreshPage();
     };
 
     const handleUpdateTime = (username, currentLimitTime) => {
@@ -202,6 +227,7 @@ const UserTable = ({users, setUsers, addtime, template}) => {
         } catch (error) {
             console.log("Update Failed");
         }
+        refreshPage();
     };
 
     async function getUser() {
@@ -276,7 +302,7 @@ const UserTable = ({users, setUsers, addtime, template}) => {
         }
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         getUser();
     }, [])
 
@@ -356,7 +382,7 @@ const UserTable = ({users, setUsers, addtime, template}) => {
                     {task === 'create' ? 
                     <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
                         <Alert severity='info' sx={{mb: 1}}>
-                            {`Note that the question for users is now ${TEMPLATE[template].label}. Add-time is ${addtime} You can change to other question in `}
+                            {`Note that the question for users is now ${TEMPLATE[template].label}. Add-time is ${addTime} You can change to other question in `}
                             <b>{"QUESTION SETTING"}</b>
                         </Alert>
                         <ListItem sx={{ display: 'grid', gridAutoColumns: '1fr'}}>
