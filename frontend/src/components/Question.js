@@ -26,9 +26,9 @@ const QuestionContent = ({login, setLogin, theme}) => {
         localStorage.clear();
     }
 
-    useEffect(() => {
-      console.log(template, add_time, total_time);
-    }, [])
+    // useEffect(() => {
+    //   console.log(template, add_time, total_time);
+    // }, [])
 
     return (
       <ThemeProvider theme={theme}>

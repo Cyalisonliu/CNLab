@@ -97,7 +97,6 @@ const LoginForm = ({identity, setIdentity, setLogin, theme, setTemplate, setAddT
             if (res.status === 200) {
                 let userarr = []
                 const data = res.data;
-                console.log(res);
                 setManagerinfo(...managerinfo, data);
             }
             else {
@@ -136,7 +135,6 @@ const LoginForm = ({identity, setIdentity, setLogin, theme, setTemplate, setAddT
 
                         const res_time = await instance.get(`/time?username=${user}`);
                         if (res_time.status === 200) {
-                            console.log(res_time.data);
                             const data_time = res_time.data[0];
                             for (const property in data_time) {
                                 if (String(property) === 'SUM(total_time)') {
@@ -150,7 +148,6 @@ const LoginForm = ({identity, setIdentity, setLogin, theme, setTemplate, setAddT
                     }
                     else if(data[i].attribute == 'Expire-After') {
                         userarr.forEach(object => {
-                            console.log(object['username'])
                             if (object['username'] == data[i].username) {
                                 object['limitTime'] = (Number(data[i].value)/3600).toFixed(2);
                             }
@@ -213,7 +210,7 @@ const LoginForm = ({identity, setIdentity, setLogin, theme, setTemplate, setAddT
                                 variant="fullWidth"
                             >
                                 <Tab value="user" label="I AM USER" />
-                                <Tab value="manager" label="I AM MANAGER" />
+                                <Tab value="manager" label="I AM ADMIN" />
                             </Tabs>
                         </Box>
                         {

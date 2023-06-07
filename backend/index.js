@@ -73,7 +73,7 @@ app.post('/insertRaduse', (req, res) => {
     )
 });
 
-app.post('/insertUerinfo', (req, res) => {
+app.post('/insertUserinfo', (req, res) => {
     const username = req.body.username;
     const template = req.body.template;
     const addtime = req.body.addtime;

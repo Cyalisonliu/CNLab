@@ -50,6 +50,7 @@ const UserTable = ({users, setUsers, addtime, temp}) => {
         requestSearch("");
     };
     const requestSearch = (searchedVal) => {
+        console.log(users);
         const filteredRows = users.filter((row) => {
             let name = row.username.toLowerCase();
             let search = searchedVal.toLowerCase();
@@ -94,7 +95,6 @@ const UserTable = ({users, setUsers, addtime, temp}) => {
             const res = await instance.delete(`/delete/RaduseUser/${username}`);
             if (res.status === 200) {
                 console.log("Delete from radusegroup successfully");
-                console.log(res.data);
                 setUsers(users.filter((val) => {
                     return val.username !== username;
                 }));
@@ -112,7 +112,6 @@ const UserTable = ({users, setUsers, addtime, temp}) => {
             const res = await instance.delete(`/delete/userinfo/${username}`);
             if (res.status === 200) {
                 console.log("Delete from userinfo successfully");
-                console.log(res.data);
                 setUsers(users.filter((val) => {
                     return val.username !== username;
                 }));
@@ -163,7 +162,6 @@ const UserTable = ({users, setUsers, addtime, temp}) => {
             });
             if (res.status === 200) {
                 console.log("Success");
-                console.log(res.data);
             }
             else {
                 console.log("Failed");
@@ -189,14 +187,13 @@ const UserTable = ({users, setUsers, addtime, temp}) => {
         }
         // INSERT INTO uerinfo
         try {
-            const res = await instance.post(`/insertUerinfo`, {
+            const res = await instance.post(`/insertUserinfo`, {
                 username: form.username, 
                 template: template,
                 addtime: addTime
             });
             if (res.status === 200) {
                 console.log("Success");
-                console.log(res.data);
             }
             else {
                 console.log("Failed");
@@ -219,7 +216,6 @@ const UserTable = ({users, setUsers, addtime, temp}) => {
             });
             if (res.status === 200) {
                 console.log("Set time successfully");
-                console.log(res.data);
             }
             else {
                 console.log("Set time Failed");
@@ -235,7 +231,6 @@ const UserTable = ({users, setUsers, addtime, temp}) => {
             const res = await instance.get(`/users`);
             if (res.status === 200) {
                 let userarr = []
-                console.log(res.data)
                 const data = res.data;
                 for (let i = 0; i < data.length; i++) {
                     let userform = {};
@@ -260,7 +255,6 @@ const UserTable = ({users, setUsers, addtime, temp}) => {
 
                         const res_time = await instance.get(`/time?username=${user}`);
                         if (res_time.status === 200) {
-                            console.log(res_time.data);
                             const data_time = res_time.data[0];
                             for (const property in data_time) {
                                 if (String(property) === 'SUM(total_time)') {
@@ -272,14 +266,6 @@ const UserTable = ({users, setUsers, addtime, temp}) => {
                         }
                         userarr = [...userarr, userform];
                     }
-                    // else if(data[i].attribute == 'Max-Bytes') {
-                    //     userarr.forEach(object => {
-                    //         console.log(object['username'])
-                    //         if (object['username'] == data[i].username) {
-                    //             object['limitTraffic'] = data[i].value;
-                    //         }
-                    //       });
-                    // }
                     else if(data[i].attribute == 'Expire-After') {
                         userarr.forEach(object => {
                             if (object['username'] == data[i].username) {
@@ -287,7 +273,6 @@ const UserTable = ({users, setUsers, addtime, temp}) => {
                             }
                           });
                     }
-                    console.log(userarr);
                 }
                 for (let i = 0; i < userarr.length; i++) {
                     setUsers(user => [...user, userarr[i]]);
@@ -376,7 +361,7 @@ const UserTable = ({users, setUsers, addtime, temp}) => {
                 sx={{p: '3'}}
             >
                 <DialogTitle>
-                { task === 'create' ? "ADD NEW USER" : "SET TRAFFIC OR TIME LIMIT" }
+                { task === 'create' ? "ADD NEW USER" : "EDIT TIME LIMIT" }
                 </DialogTitle>
                 <DialogContent sx={{mr: 2, ml: 2}}>
                     {task === 'create' ? 

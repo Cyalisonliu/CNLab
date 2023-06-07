@@ -40,7 +40,6 @@ const QuestionSetting = ({template, setTemplate, users, addTime, setAddTime}) =>
     };
 
     const handleUpdateQuestion = (username, curtemplate) => {
-        console.log(curtemplate);
         updateQuestion(username, curtemplate);
     }
     const updateQuestion = async(username, curtemplate) => {
@@ -52,7 +51,6 @@ const QuestionSetting = ({template, setTemplate, users, addTime, setAddTime}) =>
             });
             if (res.status === 200) {
                 console.log("Update question successfully");
-                console.log(res.data);
             }
             else {
                 console.log("Update question Failed");
@@ -63,7 +61,6 @@ const QuestionSetting = ({template, setTemplate, users, addTime, setAddTime}) =>
     };
 
     const handleUpdateAddtime = (username, curAddtime) => {
-        console.log(curAddtime);
         updateAddtime(username, curAddtime);
     }
     const updateAddtime = async(username, curAddtime) => {
@@ -75,7 +72,6 @@ const QuestionSetting = ({template, setTemplate, users, addTime, setAddTime}) =>
             });
             if (res.status === 200) {
                 console.log("Update addtime successfully");
-                console.log(res.data);
             }
             else {
                 console.log("Update addtime Failed");
@@ -95,7 +91,6 @@ const QuestionSetting = ({template, setTemplate, users, addTime, setAddTime}) =>
             });
             if (res.status === 200) {
                 console.log("Update manager template successfully");
-                console.log(res.data);
             }
             else {
                 console.log("Update manager template Failed");
@@ -110,7 +105,6 @@ const QuestionSetting = ({template, setTemplate, users, addTime, setAddTime}) =>
             });
             if (res.status === 200) {
                 console.log("Update manager addtime successfully");
-                console.log(res.data);
             }
             else {
                 console.log("Update manager addtime Failed");

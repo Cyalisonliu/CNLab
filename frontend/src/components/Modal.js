@@ -15,7 +15,6 @@ const handleUpdateTime = (username, currentLimitTime) => {
 }
 const updateTime = async(username, currentLimitTime) => {
     // INSERT INTO 
-    console.log(currentLimitTime);
     try {
         const res = await instance.put(`/update/time`, {
             username: username, 
@@ -23,7 +22,6 @@ const updateTime = async(username, currentLimitTime) => {
         });
         if (res.status === 200) {
             console.log("Set time successfully");
-            console.log(res.data);
         }
         else {
             console.log("Set time Failed");
@@ -37,7 +35,6 @@ const updateTime = async(username, currentLimitTime) => {
 export const EndModal = ({theme, isPlayerWon, show, setShow, add_time, total_time}) => {
 
     const handleClose = () => {
-        console.log(Number(add_time)*3600, Number(total_time)*3600)
         let time = (Number(add_time)+Number(total_time))*3600
         handleUpdateTime(localStorage.getItem('username'), time);
         setShow(false);
@@ -81,7 +78,6 @@ export const EndModal = ({theme, isPlayerWon, show, setShow, add_time, total_tim
 
 export const InfoModal = ({theme, isPlayerWon, setSquares, add_time, total_time}) => {
     const [show, setShow] = useState(true);
-    console.log(Number(add_time)*3600, Number(total_time)*3600)
     let time = (Number(add_time)+Number(total_time))*3600
     const handleClose = () => {
         handleUpdateTime(localStorage.getItem('username'), time);
@@ -148,7 +144,6 @@ export const SolutionModal = ({theme, show, setShow, add_time, total_time}) => {
 
 export const GuessModal = ({theme, add_time, total_time}) => {
     const [show, setShow] = useState(true);
-    console.log(Number(add_time)*3600, Number(total_time)*3600)
     let time = (Number(add_time)+Number(total_time))*3600
     const handleClose = () => {
         handleUpdateTime(localStorage.getItem('username'), time);

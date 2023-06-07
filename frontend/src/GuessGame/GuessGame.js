@@ -16,7 +16,6 @@ function genRandom(x) {
         s = s + arr[d];
         arr.splice(d, 1);
     }
-    console.log(s);
     return s;
 }
 
@@ -35,7 +34,6 @@ const Guess = ({theme, add_time, total_time}) => {
     }
 
     const check = () => {
-        console.log(guess);
         if (ans.length != guess.length) {
             setAlertmessage("輸入長度應該為4!!!");
             setSeverity('error');
@@ -98,7 +96,6 @@ const Guess = ({theme, add_time, total_time}) => {
 
     useEffect(() => {
         let ans = genRandom(4);
-        console.log(ans);
         setAns(ans);
     }, [])
 
